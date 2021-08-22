@@ -3,4 +3,6 @@
     <string name="position_x">x</string>
     <string name="position_y">y</string>
     <string name="record_bt">Record</string>
+    <string name="check_bt">Check</string>
+    <string name="file_name">please enter the saving name</string>
 </resources>
