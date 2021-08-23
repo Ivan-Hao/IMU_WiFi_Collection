@@ -5,6 +5,38 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal">
+        <EditText
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/position_x"
+            android:autofillHints="@string/position_x"
+            android:gravity="center"
+            android:inputType="number"
+            android:id="@+id/position_x_et"/>
+        <EditText
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/position_y"
+            android:autofillHints="@string/position_y"
+            android:gravity="center"
+            android:inputType="number"
+            android:id="@+id/position_y_et"/>
+        <Button
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/record_bt"
+            android:id="@+id/record_bt"
+            android:onClick="record"/>
+
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -58,37 +90,6 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:orientation="horizontal">
-        <EditText
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="@string/position_x"
-            android:autofillHints="@string/position_x"
-            android:gravity="center"
-            android:inputType="number"
-            android:id="@+id/position_x_et"/>
-        <EditText
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="@string/position_y"
-            android:autofillHints="@string/position_y"
-            android:gravity="center"
-            android:inputType="number"
-            android:id="@+id/position_y_et"/>
-        <Button
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/record_bt"
-            android:id="@+id/record_bt"
-            android:onClick="record"/>
-
-    </LinearLayout>
 
 
 

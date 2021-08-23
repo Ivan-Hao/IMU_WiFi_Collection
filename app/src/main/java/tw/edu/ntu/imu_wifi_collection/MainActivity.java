@@ -1,6 +1,7 @@
 package tw.edu.ntu.imu_wifi_collection;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.hardware.SensorManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
@@ -33,14 +36,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private EditText position_x_et;
     private EditText position_y_et;
     private Button record_bt;
-    private Button check_bt;
+
 
     private WifiManager wifiManager;
     private BroadcastReceiver wifiScanReceiver;
     private SensorManager sensorManager;
     private Sensor accelerometer, gyroscope, gameRotationVector;
-    private String fileName;
     private boolean start = false;
+    private File folder;
+    private File file;
+    private FileOutputStream fos;
 
 
     @Override
@@ -48,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findViews();
+        folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         wifiScanReceiver = new BroadcastReceiver() {
             @Override
@@ -84,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         position_x_et = findViewById(R.id.position_x_et);
         position_y_et = findViewById(R.id.position_y_et);
         record_bt = findViewById(R.id.record_bt);
-        check_bt = findViewById(R.id.check_bt);
         record_bt.setClickable(false);
     }
 
@@ -93,8 +98,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(file_et.getText().toString().isEmpty()){
             Toast.makeText(this, "please enter the saving name", Toast.LENGTH_LONG).show();
         }else{
-            fileName = file_et.getText().toString();
+            String fileName = file_et.getText().toString();
             record_bt.setClickable(true);
+            file = new File(folder, fileName);
+            try {
+                fos = new FileOutputStream(file, true);
+            }catch (IOException e){
+                Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+            }
             start = true;
             Toast.makeText(this, "Now you can collect data", Toast.LENGTH_LONG).show();
         }
@@ -129,9 +140,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         wifi_tv.setText(show);
         try {
-            FileOutputStream fos = openFileOutput(fileName, getApplicationContext().MODE_APPEND);
             fos.write(show.getBytes());
-            fos.close();
         }catch (IOException e){
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
         }
@@ -150,9 +159,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         wifi_tv.setText(show);
         try {
-            FileOutputStream fos = openFileOutput(fileName, getApplicationContext().MODE_APPEND);
             fos.write(show.getBytes());
-            fos.close();
         }catch (IOException e){
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
         }
@@ -171,15 +178,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             float z = event.values[0];
             String show = String.format("x: %f, y:%f, z:%f", x, y, z);
             acc_tv.setText(show);
+            record = String.format("ACC,%d,%11f,%11f,%11f\n",timestamp,x,y,z);
 
-            record = "ACC" + "," + timestamp + "," +  x + "," + y + "," + z + "\n";
         }else if(event.sensor == gyroscope){
             float x = event.values[0];
             float y = event.values[0];
             float z = event.values[0];
             String show = String.format("x: %f, y:%f, z:%f", x, y, z);
             gyro_tv.setText(show);
-            record = "GYRO" + "," + timestamp + "," + x + "," + y + "," + z + "\n";
+            record = String.format("GYRO,%d,%11f,%11f,%11f\n",timestamp,x,y,z);
         }else if(event.sensor == gameRotationVector){
             float x = event.values[0];
             float y = event.values[0];
@@ -188,15 +195,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             float w = sum > 0 ? (float)Math.sqrt(sum) : 0;
             String show = String.format("w: %f, x: %f, y:%f, z:%f", w, x, y, z);
             game_tv.setText(show);
-            record = "GRV" + "," + timestamp + "," + x + "," + y + "," + z + "\n";
+            record = String.format("GRV,%d,%11f,%11f,%11f,%11f\n",timestamp,w,x,y,z);
         }else{
             Toast.makeText(this, "something went wrong", Toast.LENGTH_SHORT).show();
             return;
         }
         try {
-            FileOutputStream fos = openFileOutput(fileName, getApplicationContext().MODE_APPEND);
             fos.write(record.getBytes());
-            fos.close();
         }catch (IOException e){
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
         }
@@ -221,5 +226,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager.unregisterListener(this);
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            fos.close();
+        }catch (IOException e){
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
 }
