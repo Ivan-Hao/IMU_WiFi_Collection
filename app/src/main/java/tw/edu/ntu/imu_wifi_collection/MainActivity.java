@@ -58,8 +58,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         wifiScanReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context c, Intent intent) {
-                boolean success = intent.getBooleanExtra(
-                        WifiManager.EXTRA_RESULTS_UPDATED, false);
+                boolean success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false);
                 if (success) {
                     scanSuccess();
                 } else {
@@ -131,10 +130,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private void scanSuccess() {
         List<ScanResult> results = wifiManager.getScanResults();
+        long appTimestamp = System.currentTimeMillis();
         String position_x = position_x_et.getText().toString();
         String position_y = position_y_et.getText().toString();
-
-        String show = "Position" + "," + position_x + "," + position_y + "\n";
+        String show = "Position" + "," +  appTimestamp + "," + position_x + "," + position_y + "\n";
         for(ScanResult result: results){
             show += "WiFi" + "," +result.BSSID + "," + result.level + "\n";
         }
@@ -152,12 +151,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         List<ScanResult> results = wifiManager.getScanResults();
         String position_x = position_x_et.getText().toString();
         String position_y = position_y_et.getText().toString();
-
-        String show = "Position" + "," + position_x + "," + position_y + "\n";
+        long appTimestamp = System.currentTimeMillis();
+        String show = "Position" + "," +  appTimestamp + "," + position_x + "," + position_y + "\n";
         for(ScanResult result: results){
             show += "WiFi" + "," +result.BSSID + "," + result.level + "\n";
         }
         wifi_tv.setText(show);
+
         try {
             fos.write(show.getBytes());
         }catch (IOException e){
@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent event) {
         String record;
         long timestamp = event.timestamp;
+        long appTimestamp = System.currentTimeMillis();
         if(!start){
             return;
         }
@@ -178,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             float z = event.values[0];
             String show = String.format("x: %f, y:%f, z:%f", x, y, z);
             acc_tv.setText(show);
-            record = String.format("ACC,%d,%11f,%11f,%11f\n",timestamp,x,y,z);
+            record = String.format("ACC,%d,%d,%11f,%11f,%11f\n",appTimestamp,timestamp,x,y,z);
 
         }else if(event.sensor == gyroscope){
             float x = event.values[0];
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             float z = event.values[0];
             String show = String.format("x: %f, y:%f, z:%f", x, y, z);
             gyro_tv.setText(show);
-            record = String.format("GYRO,%d,%11f,%11f,%11f\n",timestamp,x,y,z);
+            record = String.format("GYRO,%d,%d,%11f,%11f,%11f\n",appTimestamp,timestamp,x,y,z);
         }else if(event.sensor == gameRotationVector){
             float x = event.values[0];
             float y = event.values[0];
@@ -195,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             float w = sum > 0 ? (float)Math.sqrt(sum) : 0;
             String show = String.format("w: %f, x: %f, y:%f, z:%f", w, x, y, z);
             game_tv.setText(show);
-            record = String.format("GRV,%d,%11f,%11f,%11f,%11f\n",timestamp,w,x,y,z);
+            record = String.format("GRV,%d,%d,%11f,%11f,%11f,%11f\n",appTimestamp,timestamp,w,x,y,z);
         }else{
             Toast.makeText(this, "something went wrong", Toast.LENGTH_SHORT).show();
             return;
