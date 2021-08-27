@@ -175,23 +175,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         else if(event.sensor == accelerometer){
             float x = event.values[0];
-            float y = event.values[0];
-            float z = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
             String show = String.format("x: %f, y:%f, z:%f", x, y, z);
             acc_tv.setText(show);
             record = String.format("ACC,%d,%d,%11f,%11f,%11f\n",appTimestamp,timestamp,x,y,z);
 
         }else if(event.sensor == gyroscope){
             float x = event.values[0];
-            float y = event.values[0];
-            float z = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
             String show = String.format("x: %f, y:%f, z:%f", x, y, z);
             gyro_tv.setText(show);
             record = String.format("GYRO,%d,%d,%11f,%11f,%11f\n",appTimestamp,timestamp,x,y,z);
         }else if(event.sensor == gameRotationVector){
             float x = event.values[0];
-            float y = event.values[0];
-            float z = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
             float sum = 1 - (x*x + y*y + z*z);
             float w = sum > 0 ? (float)Math.sqrt(sum) : 0;
             String show = String.format("w: %f, x: %f, y:%f, z:%f", w, x, y, z);
